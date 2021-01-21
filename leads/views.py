@@ -6,6 +6,8 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.db.models import F
+import aiohttp
+import asyncio
 
 class ClientListCreate(generics.ListCreateAPIView):
     queryset = Clients.objects.all()
@@ -48,3 +50,11 @@ def payment_service(request):
 #     if request.method == 'GET':
 #         queryset = Operations.objects.filter(id=re)
 #         serializer_class = ServiceSerializer
+
+async def call_api():
+    async with aiohttp.ClientSession() as session:
+        async with session.get('http://api.github.com/events') as resp:
+            response = await resp.read()
+            print(response)
+
+asyncio.run(call_api())
