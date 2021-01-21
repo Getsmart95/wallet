@@ -9,4 +9,19 @@ class ClientSerializer(serializers.ModelSerializer):
 class ServiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Services
-        fields = ('id', 'name', 'wallet_id')
+        fields = ('id', 'wallet',  'name')
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transactions
+        fields = ('id', 'wallet', 'wallet_partner', 'operation_type', 'created_at', 'status', 'amount')
+
+class WalletsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wallets
+        fields = ('id', 'client', 'currency', 'balance', 'status', 'entity')
+
+class OperationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Operations
+        fields = ('id', 'service', 'transaction', 'requisite', 'status', 'created_at')
