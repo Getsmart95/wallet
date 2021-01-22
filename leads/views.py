@@ -6,12 +6,20 @@ from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import api_view
 from django.db.models import F
+from aiohttp import web
 import aiohttp
 import asyncio
+from wallet_Python import views
 
-class ClientListCreate(generics.ListCreateAPIView):
-    queryset = Clients.objects.all()
-    serializer_class = ClientSerializer
+class ClientListCreate(generics.ListCreateAPIView, web.View):
+    model = 'leads.Clients'
+    async def get_queryset(self):
+        model = apps.get_model(self.model)
+        return await database_sync_to_async(model.objects.all)
+
+    async def get(self):
+        queryset = await self.get_queryset()
+        serializer_class = ClientSerializer
 
 class ServicesListCreate(generics.ListCreateAPIView):
     queryset = Services.objects.all()
@@ -46,10 +54,6 @@ def payment_service(request):
             return Response(serializerTransaction.data, status=status.HTTP_201_CREATED)
         return Response(serializerTransaction.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# def payment_status(request):
-#     if request.method == 'GET':
-#         queryset = Operations.objects.filter(id=re)
-#         serializer_class = ServiceSerializer
 
 async def call_api():
     async with aiohttp.ClientSession() as session:
